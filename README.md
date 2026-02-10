@@ -10,27 +10,31 @@ Add to `~/.claude/settings.json`:
 {
   "statusline": {
     "type": "command",
-    "command": "npx claude-quota"
+    "command": "npx -y claude-quota"
   }
 }
 ```
 
-**Default output:**
-
-![claude-quota default output showing 5h and 7d bars](./images/claude-quota-5h.png)
-
 **Verbose mode (show percentage and time remaining):**
+
+![claude-quota verbose output with percentages and time](./images/claude-quota-verbose.png)
 
 ```json
 {
   "statusline": {
     "type": "command",
-    "command": "npx claude-quota -v"
+    "command": "npx -y claude-quota -v"
   }
 }
 ```
 
-![claude-quota verbose output with percentages and time](./images/claude-quota-verbose.png)
+**Single section example (5-hour block only with `--no-weekly`):**
+
+![claude-quota showing only 5h block](./images/claude-quota-5h.png)
+
+**Bar visualization:** Top half shows time elapsed in the block, bottom half shows usage consumed. Green = under budget, yellow = on budget, red = over budget.
+
+![claude-quota usage comparison showing green, yellow, and red states](./images/claude-quota-usage-comparison.png)
 
 ## ccstatusline Integration
 

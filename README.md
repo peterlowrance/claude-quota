@@ -1,71 +1,52 @@
-# ccquota
+# claude-quota
 
 Fast statusline showing Claude Code subscription quota usage — 5-hour block and 7-day weekly limits.
 
-## Installation
-
-No installation needed — use `npx`:
-
-```bash
-echo '{}' | npx ccquota
-```
-
-Or install globally:
-
-```bash
-npm install -g ccquota
-echo '{}' | ccquota
-```
-
 ## Usage
 
-**Basic (default):**
-
-```bash
-echo '{}' | ccquota
-```
-
-Output: `5h: ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ | 7d: ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀`
-
-**Verbose (show percentage and time remaining):**
-
-```bash
-echo '{}' | ccquota -v
-```
-
-Output: `5h: ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  34% (1h 9m left) | 7d: ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  70% (1d 17h left)`
-
-**Show only one section:**
-
-```bash
-echo '{}' | ccquota --no-weekly    # 5-hour block only
-echo '{}' | ccquota --no-block     # 7-day weekly only
-```
-
-## Claude Code Integration
-
-Configure ccquota as your Claude Code statusline in `~/.claude/settings.json`:
+Add to `~/.claude/settings.json`:
 
 ```json
 {
   "statusline": {
     "type": "command",
-    "command": "ccquota"
+    "command": "npx claude-quota"
   }
 }
 ```
 
-Claude Code pipes session data via stdin — ccquota ignores it and fetches quota data from the Anthropic API using your OAuth credentials (`~/.claude/.credentials.json`).
+**Default output:**
 
-## How It Works
+![claude-quota default output showing 5h and 7d bars](./images/claude-quota-5h.png)
 
-The bar uses half-block characters (`▀`) to overlay **time elapsed** (top, gray) vs **usage consumed** (bottom, colored):
+**Verbose mode (show percentage and time remaining):**
 
-- **Green**: usage well below time elapsed (ahead of pace)
-- **Amber**: usage roughly matches time elapsed (on pace)
-- **Red**: usage exceeds time elapsed (behind pace, may hit limit before reset)
+```json
+{
+  "statusline": {
+    "type": "command",
+    "command": "npx claude-quota -v"
+  }
+}
+```
 
-Results are cached for 30 seconds by default (configurable via `--cache-ttl`).
+![claude-quota verbose output with percentages and time](./images/claude-quota-verbose.png)
+
+## ccstatusline Integration
+
+Use as a Custom Command Widget with [ccstatusline](https://github.com/sirmalloc/ccstatusline). Enable "preserve colors" in your widget config.
+
+![claude-quota in ccstatusline](./images/claude-quota-ccstatusline.png)
+
+## Installation
+
+Optional — install globally to avoid npx overhead:
+
+```bash
+npm install -g claude-quota
+```
+
+Then use `"command": "claude-quota"` in settings.json.
 
 ## Options
 

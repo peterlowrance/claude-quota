@@ -61,14 +61,12 @@ async function getUsage(): Promise<UsageResponse> {
 
 function render(usage: UsageResponse): void {
 	const sections: string[] = [];
-	const multiSection = showBlock && showWeekly && usage.five_hour && usage.seven_day;
-	const showLabel = verbose || multiSection;
 
 	if (showBlock && usage.five_hour) {
 		const { utilization, resets_at } = usage.five_hour;
 		const timePct = computeTimeElapsedPct(resets_at, 5);
 		const bar = renderBar(timePct, utilization, barWidth);
-		let s = showLabel ? `5h: ${bar}` : bar;
+		let s = `5h: ${bar}`;
 		if (verbose) {
 			s += `  ${Math.round(utilization)}% (${formatTimeLeft(resets_at)})`;
 		}
@@ -79,7 +77,7 @@ function render(usage: UsageResponse): void {
 		const { utilization, resets_at } = usage.seven_day;
 		const timePct = computeTimeElapsedPct(resets_at, 7 * 24);
 		const bar = renderBar(timePct, utilization, barWidth);
-		let s = showLabel ? `7d: ${bar}` : bar;
+		let s = `7d: ${bar}`;
 		if (verbose) {
 			s += `  ${Math.round(utilization)}% (${formatTimeLeft(resets_at)})`;
 		}

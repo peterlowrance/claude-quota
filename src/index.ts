@@ -20,9 +20,9 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-	process.stdout.write(`ccquota - Claude Code subscription quota statusline
+	process.stdout.write(`claude-quota - Claude Code subscription quota statusline
 
-Usage: ccquota [OPTIONS]
+Usage: claude-quota [OPTIONS]
 
 Sections (all enabled by default):
   --no-block           Hide 5-hour block gauge
@@ -96,6 +96,6 @@ async function main(): Promise<void> {
 
 main().catch((err: unknown) => {
 	const msg = err instanceof Error ? err.message : String(err);
-	process.stderr.write(`ccquota: ${msg}\n`);
+	process.stderr.write(`claude-quota: ${msg}\n`);
 	process.exit(1);
 });

@@ -8,7 +8,7 @@ interface CacheEntry {
 	data: UsageResponse;
 }
 
-const CACHE_PATH = join(tmpdir(), "ccquota-cache.json");
+const CACHE_PATH = join(tmpdir(), "claude-quota-cache.json");
 
 export function readCache(ttlSeconds: number): UsageResponse | null {
 	try {

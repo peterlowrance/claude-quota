@@ -2,9 +2,17 @@
 
 Fast statusline showing Claude Code subscription quota usage — 5-hour block and 7-day weekly limits.
 
+## Quick Install
+
+```bash
+npx -y claude-quota --install
+```
+
+Automatically adds claude-quota to `~/.claude/settings.json`. If [ccstatusline](https://github.com/sirmalloc/ccstatusline) is detected, it will offer to add as a widget instead.
+
 ## Usage
 
-Add to `~/.claude/settings.json`:
+Or add to `~/.claude/settings.json` manually:
 
 ```json
 {
@@ -61,6 +69,7 @@ Then use `"command": "claude-quota"` in settings.json.
 --credentials <PATH> Custom credentials file path
 --bar-width <N>      Bar width in characters [default: 20]
 -v, --verbose        Show percentage and time remaining
+--install            Install to ~/.claude/settings.json
 -h, --help           Show this help
 ```
 

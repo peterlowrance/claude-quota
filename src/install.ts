@@ -39,15 +39,28 @@ function isCcstatusLine(command: string): boolean {
 	return command.toLowerCase().includes("ccstatusline");
 }
 
-function hasCloudeQuotaWidget(settings: CcstatusLineSettings): boolean {
-	if (!settings.lines) return false;
-	return settings.lines.some((line) =>
-		line.some(
-			(w) =>
-				w.type === "custom-command" &&
-				w.commandPath?.includes("claude-quota"),
-		),
+function findQuotaWidgets(settings: CcstatusLineSettings): CcstatusLineWidget[] {
+	if (!settings.lines) return [];
+	return settings.lines.flat().filter(
+		(w) =>
+			w.type === "custom-command" &&
+			w.commandPath?.includes("claude-quota"),
 	);
+}
+
+const REMOVED_FLAGS = ["--cache-ttl", "--credentials"];
+
+function cleanCommandPath(commandPath: string): string {
+	const parts = commandPath.split(/\s+/);
+	const cleaned: string[] = [];
+	for (let i = 0; i < parts.length; i++) {
+		if (REMOVED_FLAGS.includes(parts[i])) {
+			i++; // skip the flag's value
+		} else {
+			cleaned.push(parts[i]);
+		}
+	}
+	return cleaned.join(" ");
 }
 
 function findEmptyLineIndex(settings: CcstatusLineSettings): number {
@@ -59,7 +72,7 @@ async function installToCcstatusLine(): Promise<boolean> {
 	const configPath = join(
 		homedir(),
 		".config",
-		"ccstatusLine",
+		"ccstatusline",
 		"settings.json",
 	);
 
@@ -71,8 +84,24 @@ async function installToCcstatusLine(): Promise<boolean> {
 		return false;
 	}
 
-	if (hasCloudeQuotaWidget(settings)) {
-		process.stdout.write("claude-quota is already in ccstatusLine.\n");
+	const existingWidgets = findQuotaWidgets(settings);
+	if (existingWidgets.length > 0) {
+		let updated = false;
+		for (const w of existingWidgets) {
+			if (w.commandPath) {
+				const cleaned = cleanCommandPath(w.commandPath);
+				if (cleaned !== w.commandPath) {
+					w.commandPath = cleaned;
+					updated = true;
+				}
+			}
+		}
+		if (updated) {
+			writeFileSync(configPath, JSON.stringify(settings, null, 2), "utf-8");
+			process.stdout.write("✓ Updated claude-quota widgets in ccstatusline config\n");
+		} else {
+			process.stdout.write("claude-quota is already in ccstatusline.\n");
+		}
 		return true;
 	}
 

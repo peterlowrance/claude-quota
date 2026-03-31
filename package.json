@@ -1,6 +1,6 @@
 {
   "name": "claude-quota",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fast statusline showing Claude Code subscription quota usage",
   "repository": {
     "type": "git",

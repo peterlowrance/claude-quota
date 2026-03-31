@@ -1,8 +1,5 @@
 import { parseArgs } from "node:util";
-import { readAccessToken } from "./credentials.ts";
-import { readStdinHook } from "./hook.ts";
-import { fetchUsage, type UsageResponse } from "./api.ts";
-import { readCache, writeCache } from "./cache.ts";
+import { readStdinHook, extractUsageFromHook, type UsageData } from "./hook.ts";
 import { renderBar } from "./bar.ts";
 import { formatTimeLeft, computeTimeElapsedPct } from "./format.ts";
 import { installToClaudeSettings } from "./install.ts";
@@ -11,8 +8,6 @@ const { values } = parseArgs({
 	options: {
 		"no-block": { type: "boolean", default: false },
 		"no-weekly": { type: "boolean", default: false },
-		"cache-ttl": { type: "string", default: "30" },
-		credentials: { type: "string" },
 		"bar-width": { type: "string", default: "20" },
 		verbose: { type: "boolean", short: "v", default: false },
 		install: { type: "boolean", default: false },
@@ -31,35 +26,22 @@ Sections (all enabled by default):
   --no-weekly          Hide 7-day weekly gauge
 
 Behavior:
-  --cache-ttl <SECS>   Cache TTL in seconds [default: 30]
-  --credentials <PATH> Custom credentials file path
   --bar-width <N>      Bar width in characters [default: 20]
   -v, --verbose        Show percentage and time remaining
   --install            Install to ~/.claude/settings.json
   -h, --help           Show this help
 
-Reads Claude Code hook JSON from stdin.
+Reads rate_limits from Claude Code hook JSON on stdin.
 `);
 	process.exit(0);
 }
 
-const cacheTtl = Number.parseInt(values["cache-ttl"]!, 10);
 const barWidth = Number.parseInt(values["bar-width"]!, 10);
 const showBlock = !values["no-block"];
 const showWeekly = !values["no-weekly"];
 const verbose = values.verbose!;
 
-async function getUsage(): Promise<UsageResponse> {
-	const cached = readCache(cacheTtl);
-	if (cached) return cached;
-
-	const token = readAccessToken(values.credentials);
-	const usage = await fetchUsage(token);
-	writeCache(usage);
-	return usage;
-}
-
-function render(usage: UsageResponse): void {
+function render(usage: UsageData): void {
 	const sections: string[] = [];
 
 	if (showBlock && usage.five_hour) {
@@ -95,8 +77,12 @@ async function main(): Promise<void> {
 		return;
 	}
 
-	readStdinHook();
-	const usage = await getUsage();
+	const hook = readStdinHook();
+	const usage = extractUsageFromHook(hook);
+	if (!usage) {
+		process.stderr.write("claude-quota: no rate_limits in hook data\n");
+		process.exit(1);
+	}
 	render(usage);
 }
 

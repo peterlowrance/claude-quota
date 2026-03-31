@@ -16,7 +16,7 @@ Or add to `~/.claude/settings.json` manually:
 
 ```json
 {
-  "statusline": {
+  "statusLine": {
     "type": "command",
     "command": "npx -y claude-quota"
   }
@@ -29,7 +29,7 @@ Or add to `~/.claude/settings.json` manually:
 
 ```json
 {
-  "statusline": {
+  "statusLine": {
     "type": "command",
     "command": "npx -y claude-quota -v"
   }
@@ -65,8 +65,6 @@ Then use `"command": "claude-quota"` in settings.json.
 ```
 --no-block           Hide 5-hour block gauge
 --no-weekly          Hide 7-day weekly gauge
---cache-ttl <SECS>   Cache TTL in seconds [default: 30]
---credentials <PATH> Custom credentials file path
 --bar-width <N>      Bar width in characters [default: 20]
 -v, --verbose        Show percentage and time remaining
 --install            Install to ~/.claude/settings.json

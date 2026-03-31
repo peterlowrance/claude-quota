@@ -4,14 +4,14 @@ import { homedir } from "node:os";
 import { createInterface } from "node:readline/promises";
 
 interface ClaudeSettings {
-	statusline?: {
+	statusLine?: {
 		type: string;
 		command: string;
 	};
 	[key: string]: unknown;
 }
 
-interface CcstatuslineWidget {
+interface CcstatusLineWidget {
 	id: string;
 	type: string;
 	commandPath?: string;
@@ -19,9 +19,9 @@ interface CcstatuslineWidget {
 	[key: string]: unknown;
 }
 
-interface CcstatuslineSettings {
+interface CcstatusLineSettings {
 	version?: number;
-	lines?: CcstatuslineWidget[][];
+	lines?: CcstatusLineWidget[][];
 	[key: string]: unknown;
 }
 
@@ -35,11 +35,11 @@ async function prompt(question: string): Promise<boolean> {
 	return answer.toLowerCase() === "y";
 }
 
-function isCcstatusline(command: string): boolean {
-	return command.includes("ccstatusline");
+function isCcstatusLine(command: string): boolean {
+	return command.includes("ccstatusLine");
 }
 
-function hasCloudeQuotaWidget(settings: CcstatuslineSettings): boolean {
+function hasCloudeQuotaWidget(settings: CcstatusLineSettings): boolean {
 	if (!settings.lines) return false;
 	return settings.lines.some((line) =>
 		line.some(
@@ -50,20 +50,20 @@ function hasCloudeQuotaWidget(settings: CcstatuslineSettings): boolean {
 	);
 }
 
-function findEmptyLineIndex(settings: CcstatuslineSettings): number {
+function findEmptyLineIndex(settings: CcstatusLineSettings): number {
 	if (!settings.lines) return -1;
 	return settings.lines.findIndex((line) => line.length === 0);
 }
 
-async function installToCcstatusline(): Promise<boolean> {
+async function installToCcstatusLine(): Promise<boolean> {
 	const configPath = join(
 		homedir(),
 		".config",
-		"ccstatusline",
+		"ccstatusLine",
 		"settings.json",
 	);
 
-	let settings: CcstatuslineSettings;
+	let settings: CcstatusLineSettings;
 	try {
 		const raw = readFileSync(configPath, "utf-8");
 		settings = JSON.parse(raw);
@@ -72,14 +72,14 @@ async function installToCcstatusline(): Promise<boolean> {
 	}
 
 	if (hasCloudeQuotaWidget(settings)) {
-		process.stdout.write("claude-quota is already in ccstatusline.\n");
+		process.stdout.write("claude-quota is already in ccstatusLine.\n");
 		return true;
 	}
 
 	const emptyIdx = findEmptyLineIndex(settings);
 	if (emptyIdx === -1) {
 		process.stdout.write(
-			"No empty lines available in ccstatusline config.\n",
+			"No empty lines available in ccstatusLine config.\n",
 		);
 		const addNew = await prompt("Add a new line for claude-quota?");
 		if (!addNew) return false;
@@ -94,7 +94,7 @@ async function installToCcstatusline(): Promise<boolean> {
 		]);
 	} else {
 		const ok = await prompt(
-			`Add claude-quota to ccstatusline line ${emptyIdx + 1}?`,
+			`Add claude-quota to ccstatusLine line ${emptyIdx + 1}?`,
 		);
 		if (!ok) return false;
 		settings.lines![emptyIdx] = [
@@ -109,9 +109,9 @@ async function installToCcstatusline(): Promise<boolean> {
 
 	writeFileSync(configPath, JSON.stringify(settings, null, 2), "utf-8");
 	process.stdout.write(
-		"✓ Added claude-quota to ccstatusline config\n",
+		"✓ Added claude-quota to ccstatusLine config\n",
 	);
-	process.stdout.write("  Restart Claude Code to see the statusline\n");
+	process.stdout.write("  Restart Claude Code to see the statusLine\n");
 	return true;
 }
 
@@ -126,28 +126,28 @@ export async function installToClaudeSettings(): Promise<void> {
 		mkdirSync(dirname(settingsPath), { recursive: true });
 	}
 
-	// If ccstatusline is already installed, add as a widget instead
-	if (settings.statusline && isCcstatusline(settings.statusline.command)) {
+	// If ccstatusLine is already installed, add as a widget instead
+	if (settings.statusLine && isCcstatusLine(settings.statusLine.command)) {
 		process.stdout.write(
-			"ccstatusline detected as current statusline.\n",
+			"ccstatusLine detected as current statusLine.\n",
 		);
 		const addWidget = await prompt(
-			"Add claude-quota as a ccstatusline widget?",
+			"Add claude-quota as a ccstatusLine widget?",
 		);
 		if (addWidget) {
-			const installed = await installToCcstatusline();
+			const installed = await installToCcstatusLine();
 			if (installed) return;
 		}
 		const overwrite = await prompt(
-			"Replace ccstatusline with claude-quota instead?",
+			"Replace ccstatusLine with claude-quota instead?",
 		);
 		if (!overwrite) {
 			process.stdout.write("Installation cancelled.\n");
 			return;
 		}
-	} else if (settings.statusline) {
+	} else if (settings.statusLine) {
 		process.stdout.write(
-			`Existing statusline found: ${JSON.stringify(settings.statusline.command)}\n`,
+			`Existing statusLine found: ${JSON.stringify(settings.statusLine.command)}\n`,
 		);
 		const overwrite = await prompt("Overwrite with claude-quota?");
 		if (!overwrite) {
@@ -156,12 +156,12 @@ export async function installToClaudeSettings(): Promise<void> {
 		}
 	}
 
-	settings.statusline = {
+	settings.statusLine = {
 		type: "command",
 		command: "npx -y claude-quota",
 	};
 
 	writeFileSync(settingsPath, JSON.stringify(settings, null, 2), "utf-8");
 	process.stdout.write("✓ Installed to ~/.claude/settings.json\n");
-	process.stdout.write("  Restart Claude Code to see the statusline\n");
+	process.stdout.write("  Restart Claude Code to see the statusLine\n");
 }

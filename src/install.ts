@@ -36,7 +36,7 @@ async function prompt(question: string): Promise<boolean> {
 }
 
 function isCcstatusLine(command: string): boolean {
-	return command.includes("ccstatusLine");
+	return command.toLowerCase().includes("ccstatusline");
 }
 
 function hasCloudeQuotaWidget(settings: CcstatusLineSettings): boolean {
